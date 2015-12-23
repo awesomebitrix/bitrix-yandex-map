@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Карта ЯНДЕКС</title>
+	<script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+</head>
+<body>
+
+<p><i>Все вычисления производятся на стороне браузера (клиента)</i></p>
+<p><i>Для работы сервиса необходимо соединение с интернетом</i></p>
+<p><i>Небходим доступ до следующих адресов:</i></p>
+<ul>
+	<li><a href="https://maps.yandex.ru">https://maps.yandex.ru</a></li>
+	<li><a href="https://geocode-maps.yandex.ru/1.x/">https://geocode-maps.yandex.ru/1.x/</a></li>
+	<li><a href="https://code.jquery.com">https://code.jquery.com</a></li>
+</ul>
+
+<input style="width:30%" type="text" id="position">
+<input type="submit" onclick="find_pos($('#position').val())">
+
+<div class="info">
+	<p><b>Координаты центра объекта</b> = <span id="pos"></span></p>
+	<p><b>Верхняя граница области, внутри которой объект рекомендуется показать на карте</b> = <span id="upperCorner"></span></p>
+	<p><b>Нижняя граница области, внутри которой объект рекомендуется показать на карте</b> = <span id="lowerCorner"></span></p>
+</div>
+
+<p>
+	<a href="#" onclick="$('.manual').toggle()">Показать/Скрыть правило построения</a>
+</p>
+
+<div class="manual">
+	<pre>
+	<b>Правило построения координат местоположения</b>
+
+	pos = 
+		1 = 55.590984 
+		2 = 56.924579 
+
+	upperCorner = 
+		1 = 55.599212 
+		2 = 56.929078
+
+	pos[2]	 	upperCorner[2] 		pos[1]		upperCorner[1]
+	56.924579 	56929078 		55.590984 	55599212
+	</pre>
+</div>
+
+<div class="info">
+	<p>
+		<a id="testMap" href="https://maps.yandex.ru/?text=">Проверить позицию на карте</a>
+	</p>
+	<p>
+		<a id="testJSON" href="https://geocode-maps.yandex.ru/1.x/?format=json&geocode=">Просмотреть JSON массив</a>
+	</p>
+</div>
+
+<script>
+//Скрываем DIV-ы с информацией, т.к. они ещё не заполнены
+$('.info').hide();
+
+//функция получения координат
+function find_pos (position){
+	//GET запрос на получение JSON массива с координатами
+	$.getJSON("https://geocode-maps.yandex.ru/1.x/?format=json&geocode="+position, function(data) {
+		//Координаты центра объекта
+	    $('#pos').text(data.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos);
+	    var pos = data.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos
+	    //Создаем массив из строки. Разделитель - пробел
+	    var posArr = pos.split(' ')
+	    //Создаем массив из строк предидущего массива. Разделитель - точка
+	    var posLeft = posArr[0].split('.')
+	    var posRight = posArr[1].split('.')
+
+	   	//Нижняя граница области, внутри которой объект рекомендуется показать на карте
+	   	$('#lowerCorner').text(data.response.GeoObjectCollection.featureMember[0].GeoObject.boundedBy.Envelope.lowerCorner);
+
+	   	//Верхняя граница области, внутри которой объект рекомендуется показать на карте
+	    $('#upperCorner').text(data.response.GeoObjectCollection.featureMember[0].GeoObject.boundedBy.Envelope.upperCorner);
+	    var upperCorner = data.response.GeoObjectCollection.featureMember[0].GeoObject.boundedBy.Envelope.upperCorner
+	    //Создаем массив по аналогии с коордитами центра объекта
+	    var upperCornerArr = upperCorner.split(' ')
+	    var upperCornerLeft = upperCornerArr[0].split('.')
+	    var upperCornerRight = upperCornerArr[1].split('.')
+
+	   	//Задаем URL для просмотра карты
+	    var urlMap = "https://maps.yandex.ru/?text="+ posRight[0]+'.'+posRight[1]+upperCornerRight[0]+upperCornerRight[1]+' '+posLeft[0]+'.'+posLeft[1]+upperCornerLeft[0]+upperCornerLeft[1]
+	    //Задаем URL для просмотра JSON массива
+	    var urlJSON = "https://geocode-maps.yandex.ru/1.x/?format=json&geocode="+ position
+
+	    //Устанавливаем URL для просмотра карты
+	    $('a#testMap').attr("href",urlMap)
+	    //Устанавливаем URL для просмотра JSON массива
+	    $('a#testJSON').attr("href",urlJSON)
+
+	    //Показываем DIV-ы с информацией
+	    $('.info').show();
+	    
+	});
+}
+</script>
+
+</body>
+</html>
