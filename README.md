@@ -1,2 +1,4 @@
 # bitrix-yandex-map
-These pages will help you create the coordinates for the widget "Yandex maps" Bitrix platform.
+Эти страницы помогут вам сформировать правильные координаты для виджета "Яндекс.карты" на платформе Bitrix
+- map-js - предназначен для определения коррдинат на стороне браузера
+- map-php - предназначен для определения координат на стороне сервера
