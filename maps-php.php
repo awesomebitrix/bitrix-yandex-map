@@ -15,7 +15,7 @@
 
     //задаем метоположение
 	$adr = 'с. Барда, ул. Ленина, д. 52г ';
-	$name_adr = 'Филиал &quot;Бардымский&quot; КГАУ &laquo;Пермский краевой МФЦ ПГМУ&raquo;';
+	$name_adr = 'Филиал';
 	
 	$urlXML = 'https://geocode-maps.yandex.ru/1.x/?geocode='.$adr;
 
